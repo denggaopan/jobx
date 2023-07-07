@@ -101,10 +101,10 @@
         <Switch @bind-Value="@context.CovenantReturnModel" />
         </FormItem>
         <FormItem Label="请求头">
-            <Input Placeholder="格式为Json键值对如{'authorization':'xxxxxx'}" @bind-Value="@context.Headers" OnChange="DataSave" TValue="string" />
+            <Input Placeholder="Json格式" @bind-Value="@context.Headers" OnChange="DataSave" TValue="string" />
         </FormItem>
         <FormItem Label="请求参数">
-            <Input Placeholder="格式为Json键值对如{'data':'data'}" @bind-Value="@context.RequestParameters" OnChange="DataSave" TValue="string" />
+            <Input Placeholder="Json格式" @bind-Value="@context.RequestParameters" OnChange="DataSave" TValue="string" />
         </FormItem>
         <FormItem Label="任务描述">
             <TextArea @bind-Value="@context.Description" OnChange="DataSave"
