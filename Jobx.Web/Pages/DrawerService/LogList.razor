@@ -1,0 +1,78 @@
+﻿@namespace AntDesign
+@using Jobx.Core.Service.App
+@using Jobx.Core.Service.App.Dto
+@using Jobx.Core.Service.App.Enum
+@using Jobx.Core.Service.Timer.Dto
+@inject IJobLogService joblogservice
+@inject MessageService _message
+@inherits DrawerTemplate<string, string>
+
+<Table DataSource="@logItems" Bordered=@true Loading="@isLoading" Size=@TableSize.Middle>
+    <RowTemplate>
+        <Column @bind-Field="@context.REQUEST_URL" Title="请求地址" Ellipsis></Column>
+        <Column @bind-Field="@context.RESPONSE_DATA" Ellipsis></Column>
+        <Column @bind-Field="@context.EXECUTION_STATUS" Width="100">
+            @{
+                var color = "";
+                switch (context.EXECUTION_STATUS)
+                {
+                    case ExecutionStatusEnum.Success:
+                        color = "green";
+                        break;
+                    case ExecutionStatusEnum.Failure:
+                        color = "red";
+                        break;
+                    default:
+                        color = "gray";
+                        break;
+                }
+                <Tag Color="@color">@context.EXECUTION_STATUS</Tag>
+            }
+        </Column>
+        <Column @bind-Field="@context.BEGIN_TIME" Width="160"></Column>
+    </RowTemplate>
+    <ExpandTemplate>
+        @context.Data.RESPONSE_DATA
+    </ExpandTemplate>
+</Table>
+@code {
+    private List<JOB_EXECUTION_LOG> logItems;
+    bool isLoading = false;
+
+    string value;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            await LoadTable();
+
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            await _message.Error(ex.Message);
+        }
+    }
+
+    async void OnClose()
+    {
+        await this.CloseAsync(value);
+    }
+
+    /// <summary>
+    /// 加载表格
+    /// </summary>
+    /// <returns></returns>
+    private async Task LoadTable()
+    {
+        var querylogDto = JsonConvert.DeserializeObject<QueryLogDto>(base.Options);
+        var start_time = DateTime.Now.AddYears(-10);
+        var end_time = DateTime.Now;
+        querylogDto.start_time = start_time.ToString("yyyy-MM-dd HH:mm:ss");
+        querylogDto.end_time = end_time.ToString("yyyy-MM-dd HH:mm:ss");
+        logItems = await joblogservice.GetList(querylogDto);
+    }
+}
